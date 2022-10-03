@@ -53,9 +53,7 @@ def send_message(bot: telegram.Bot, message: str) -> None:
 
 
 def get_api_answer(current_timestamp: int) -> dict:
-    """Делаем запрос к единственному эндпоинту API-сервиса
-    Практикум.Домашка.
-    """
+    """Делаем запрос к эндпоинту API-сервиса Практикум.Домашка."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -90,9 +88,7 @@ def check_response(response: dict) -> list:
 
 
 def parse_status(homework: dict) -> str:
-    """Извлекаем из информации о конкретной домашней работе
-    статус этой работы.
-    """
+    """Извлекаем из информации о домашней работе статус этой работы."""
     if homework['homework_name'] is None:
         message_error = 'Ошибка получения значения по ключу в словаре'
         logger.error(message_error)
