@@ -8,8 +8,12 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
-from homework_bot.exceptions import UnavailabilityEndpoint, \
-    RequestFailureEndpoint, ErrorValueDictionary, VariablesNotDefined
+from exceptions import (UnavailabilityEndpoint,
+                        RequestFailureEndpoint,
+                        ErrorValueDictionary,
+                        VariablesNotDefined,
+                        ObjectNotInstance
+                        )
 
 load_dotenv()
 
@@ -84,6 +88,10 @@ def check_response(response: dict) -> list:
         logger.error(message_error)
         raise ErrorValueDictionary(message_error)
     homeworks = response['homeworks']
+    if not isinstance(homeworks, list):
+        message_error = 'Полученный объект не является списком'
+        logger.error(message_error)
+        raise ObjectNotInstance(message_error)
     return homeworks
 
 

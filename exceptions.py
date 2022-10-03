@@ -20,3 +20,9 @@ class VariablesNotDefined(Exception):
     """Отсутствуют обязательные переменные окружения."""
 
     pass
+
+
+class ObjectNotInstance(Exception):
+    """Получаемый объект другого типа данных."""
+
+    pass
