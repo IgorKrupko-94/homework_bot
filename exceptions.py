@@ -16,13 +16,13 @@ class ErrorValueDictionary(Exception):
     pass
 
 
-class VariablesNotDefined(Exception):
-    """Отсутствуют обязательные переменные окружения."""
+class ObjectNotInstance(Exception):
+    """Получаемый объект другого типа данных."""
 
     pass
 
 
-class ObjectNotInstance(Exception):
-    """Получаемый объект другого типа данных."""
+class SendMessageTelegramError(Exception):
+    """Ошибка при отправке сообщения в Telegram чат."""
 
     pass
