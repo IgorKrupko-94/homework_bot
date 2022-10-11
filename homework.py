@@ -22,10 +22,11 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 RETRY_TIME = 600
+
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
-HOMEWORK_STATUSES = {
+VERDICTS = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
@@ -63,21 +64,26 @@ def get_api_answer(current_timestamp: int) -> dict:
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
+        logger.info('Отправляем запрос к API Практикум.Домашка')
         response = requests.get(
             ENDPOINT,
             headers=HEADERS,
             params=params
         )
-        if response.status_code != HTTPStatus.OK:
-            raise UnavailabilityEndpoint(
-                f'Эндпоинт недоступен. '
-                f'Статус-код ответа API: {response.status_code}'
-            )
-        return response.json()
     except Exception as error:
         raise RequestFailureEndpoint(
             f'Сбой при запросе к эндпоинту: {error}'
+            f'Параметры запроса {ENDPOINT}, {params}'
         )
+    else:
+        if response.status_code != HTTPStatus.OK:
+            raise UnavailabilityEndpoint(
+                'Эндпоинт недоступен. '
+                f'Статус-код ответа API: {response.status_code}'
+                f'{response.text}'
+                f'Параметры запроса: {ENDPOINT}, {params}'
+            )
+    return response.json()
 
 
 def check_response(response: dict) -> list:
@@ -109,7 +115,7 @@ def parse_status(homework: dict) -> str:
             'Ошибка получения значения по ключу в словаре'
         )
     try:
-        verdict = HOMEWORK_STATUSES[homework_status]
+        verdict = VERDICTS[homework_status]
     except KeyError as error:
         raise ErrorValueDictionary(
             f'Недокументированный статус домашней работы: {error}'
@@ -119,7 +125,11 @@ def parse_status(homework: dict) -> str:
 
 def check_tokens() -> bool:
     """Проверяем доступность переменных окружения."""
-    return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
+    tokens = (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
+    for token in tokens:
+        if not token:
+            logger.critical(f'Отсутствует {token}')
+    return all(tokens)
 
 
 def main() -> None:
@@ -136,18 +146,21 @@ def main() -> None:
         try:
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
-            for homework in homeworks:
-                if homework['date_updated'] != previous_time:
+            if len(homeworks) < 1:
+                logger.debug('Новых изменений не обнаружено')
+            else:
+                homework = homeworks[0]
+                if homework['date_updated'] == previous_time:
+                    logger.debug('Новых статусов не обнаружено')
+                else:
                     previous_time = homework['date_updated']
                     message = parse_status(homework)
                     send_message(bot, message)
-                else:
-                    logger.debug('Новых статусов не обнаружено')
             current_timestamp = response.get('current_date')
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
-            logger.error(message)
+            logger.error(message, exc_info=True)
             if message != message_error:
                 send_message(bot, message)
                 message_error = message
