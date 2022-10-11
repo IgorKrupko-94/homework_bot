@@ -10,8 +10,7 @@ class UnavailabilityEndpoint(Exception):
     def __str__(self):
         if self.message:
             return f'UnavailabilityEndpoint, {self.message}'
-        else:
-            return 'UnavailabilityEndpoint, статус-код ответа не равен 200'
+        return 'Статус-код ответа не равен 200'
 
 
 class RequestFailureEndpoint(Exception):
@@ -26,8 +25,7 @@ class RequestFailureEndpoint(Exception):
     def __str__(self):
         if self.message:
             return f'RequestFailureEndpoint, {self.message}'
-        else:
-            return 'RequestFailureEndpoint, ошибка при запросе к эндпоинту'
+        return 'Ошибка при запросе к эндпоинту'
 
 
 class ErrorValueDictionary(Exception):
@@ -42,9 +40,7 @@ class ErrorValueDictionary(Exception):
     def __str__(self):
         if self.message:
             return f'ErrorValueDictionary, {self.message}'
-        else:
-            return ('ErrorValueDictionary,'
-                    'получен недокументированный статус домашней работы')
+        return 'Получен недокументированный статус домашней работы'
 
 
 class ObjectNotInstance(Exception):
@@ -59,9 +55,7 @@ class ObjectNotInstance(Exception):
     def __str__(self):
         if self.message:
             return f'ObjectNotInstance, {self.message}'
-        else:
-            return ('ObjectNotInstance, '
-                    'полученный объект является неправильным типом данных')
+        return 'Полученный объект является неправильным типом данных'
 
 
 class SendMessageTelegramError(Exception):
@@ -76,6 +70,4 @@ class SendMessageTelegramError(Exception):
     def __str__(self):
         if self.message:
             return f'SendMessageTelegramError, {self.message}'
-        else:
-            return ('SendMessageTelegramError, '
-                    'ошибка при отправке сообщения в телеграм-чат')
+        return 'Ошибка при отправке сообщения в телеграм-чат'

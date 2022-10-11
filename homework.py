@@ -73,7 +73,7 @@ def get_api_answer(current_timestamp: int) -> dict:
     except Exception as error:
         raise RequestFailureEndpoint(
             f'Сбой при запросе к эндпоинту: {error}'
-            f'Параметры запроса {ENDPOINT}, {params}'
+            f'Параметры запроса {ENDPOINT}, {HEADERS}, {params}'
         )
     else:
         if response.status_code != HTTPStatus.OK:
@@ -81,7 +81,7 @@ def get_api_answer(current_timestamp: int) -> dict:
                 'Эндпоинт недоступен. '
                 f'Статус-код ответа API: {response.status_code}'
                 f'{response.text}'
-                f'Параметры запроса: {ENDPOINT}, {params}'
+                f'Параметры запроса: {ENDPOINT}, {HEADERS}, {params}'
             )
     return response.json()
 
